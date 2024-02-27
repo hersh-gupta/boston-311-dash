@@ -59,11 +59,18 @@ const requests = FileAttachment("data/311_2024.geojson").json();
   <div>${resize((width) =>
       Plot.plot({
         width,
-        x: {interval: "day", label: null},
+        x: {interval: "day", label: "Date"},
         y: {grid: true, label: "Requests"},
         marks: [
-            Plot.lineY(data, Plot.groupX({y:"count"},{x: "open_dt",curve: "basis", tip: true})),
-          Plot.ruleY([0])
+            Plot.lineY(data, Plot.groupX({y:"count"},{x: "open_dt", curve: "basis", 
+            tip: {
+                  format: {
+                    y: (d) => `${d}`,
+                    x: (d) => `${d.toDateString()}`
+                  }
+            }
+              })),
+            Plot.ruleY([0])
         ]
       })
   )}</div>

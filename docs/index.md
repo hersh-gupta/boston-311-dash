@@ -1,6 +1,7 @@
 ---
 theme: ["air", "alt", "wide"]
 toc: false
+style: custom-style.css
 ---
 
 # Boston 311 Dashboard
@@ -117,7 +118,10 @@ const requests = await arqueroTableToGeoJSON(data);
             }
               })),
             Plot.ruleY([0])
-        ]
+        ],
+        style: {
+          fontFamily: "Montserrat"
+        }
       })
   )}</div>
   </div>
@@ -182,9 +186,9 @@ map.on("load", () => {
         "match",
         ["get", "case_status"],
         "Open",
-        "#50C878",
+        "#FB4D42",
         "Closed",
-        "#C1E1C1",
+        "#091F2F",
         "#CCC",
       ],
       "circle-stroke-width": 1,

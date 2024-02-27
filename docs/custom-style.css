@@ -1,0 +1,46 @@
+@import url("observablehq:default.css");
+@import url("observablehq:theme-air.css");
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+
+:root {
+    --theme-foreground: #F2F2F2;
+    --theme-background: #091F2F;
+    --theme-background-alt:	#091F2F;
+    --theme-foreground-alt: #F2F2F2;
+    --theme-foreground-muted: #E0E0E0;
+    --theme-foreground-faint: #E0E0E0;
+    --theme-foreground-fainter: #D2D2D2;
+    --theme-foreground-faintest: #58585B;
+    --theme-foreground-focus: #288BE4;
+    font-family: "Montserrat", "Lora", sans-serif !important;
+}
+
+h1 {
+    font-family: "Lora", serif;
+}
+
+h2 {
+    font-family: "Lora", serif;
+}
+
+h3 {
+    font-family: "Montserrat", san-serif;
+}
+
+p {
+    font-family: "Montserrat", san-serif;
+}
+
+span {
+    font-family: "Montserrat", san-serif;
+}
+
+.mapboxgl-popup-content {
+    color: #000;
+    font-family: "Montserrat", san-serif;
+}
+
+#svg {
+    font-family: "Montserrat", san-serif !important;
+  }

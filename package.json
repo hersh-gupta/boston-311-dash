@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "private": true,
   "scripts": {
     "clean": "rm -rf docs/.observablehq/cache",

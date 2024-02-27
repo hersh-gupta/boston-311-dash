@@ -9,10 +9,16 @@ An overview of [Boston's 311 Constituent Service Center](https://www.boston.gov/
 
 ```js
 const parseMDY = d3.timeParse("%Y-%m-%d %H:%M:%S");
-const data = await aq.fromArrow(
-  await FileAttachment("data/2024.parquet").parquet())
-  .derive({ open_dt: aq.escape(d => parseMDY(d.open_dt)),
-            closed_dt: aq.escape(d => parseMDY(d.closed_dt)) });
+
+const urlCSV =
+  "https://data.boston.gov/datastore/dump/dff4d804-5031-443a-8409-8344efd0e5c8?bom=True";
+
+const data = await aq
+  .fromCSV(await fetch(urlCSV).then((res) => res.text()))
+  .derive({
+    open_dt: aq.escape((d) => parseMDY(d.open_dt)),
+    closed_dt: aq.escape((d) => parseMDY(d.closed_dt)),
+  });
 
 const pctOntime = data.rollup({
   freq: (d) => aq.op.mean(d.on_time == "ONTIME"),
@@ -25,12 +31,52 @@ const avgClosure = data
   .derive({ avg: aq.escape((d) => d3.timeDay.count(d.open_dt, d.closed_dt)) })
   .rollup({ avg: aq.op.mean("avg") });
 
-const requests = FileAttachment("data/311_2024.geojson").json();
+async function arqueroTableToGeoJSON(data) {
+  await data; // Wait for the table to be instantiated
+  // Extract columns from the Arquero table
+  const latitudes = data.array("latitude");
+  const longitudes = data.array("longitude");
+  const ids = data.array("_id");
+  const titles = data.array("case_title");
+  const locations = data.array("location");
+  const dates = data.array("open_dt");
+  const statuses = data.array("case_status");
+
+  // Create an array of GeoJSON features
+  const features = [];
+  for (let i = 0; i < latitudes.length; i++) {
+    const feature = {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [longitudes[i], latitudes[i]],
+      },
+      properties: {
+        id: ids[i],
+        case_title: titles[i],
+        location: locations[i],
+        open_dt: dates[i],
+        case_status: statuses[i],
+      },
+    };
+    features.push(feature);
+  }
+
+  // Create a GeoJSON FeatureCollection
+  const geoJSON = {
+    type: "FeatureCollection",
+    features: features,
+  };
+
+  return geoJSON;
+}
+
+const requests = await arqueroTableToGeoJSON(data);
 ```
 
 ```js
 /* Inputs.table([...data]) */
-/* display([...data]); */
+/* display(requests); */
 ```
 
 <div class="grid grid-cols-4" style="margin-top: 2rem;">

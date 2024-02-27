@@ -19,7 +19,7 @@ export default {
   // Some additional configuration options and their defaults:
   // theme: "default", // try "light", "dark", "slate", etc.
   // header: `<div>GitHub</div>`,
-  footer: `Built by <a href="https://github.com/hersh-gupta">Hersh Gupta</a> using the <a href="https://observablehq.com/">Observable Framework</a>."`, // what to show in the footer (HTML)
+  footer: `Built by <a href="https://github.com/hersh-gupta">Hersh Gupta</a> using the <a href="https://observablehq.com/">Observable Framework</a>.`, // what to show in the footer (HTML)
   // toc: true, // whether to show the table of contents
   // pager: true, // whether to show previous & next links in the footer
   // root: "docs", // path to the source root for preview

@@ -4,24 +4,33 @@ toc: false
 ---
 
 # Boston 311 Dashboard
+
 An overview of [Boston's 311 Constituent Service Center](https://www.boston.gov/departments/boston-311) request [data for 2024](https://data.boston.gov/dataset/311-service-requests/resource/dff4d804-5031-443a-8409-8344efd0e5c8), which is kindly made available under the [Public Domain Dedication and License v1.0](http://opendatacommons.org/licenses/pddl/1.0/).
 
 ```js
-const parseMDY = d3.timeParse('%Y-%m-%d %H:%M:%S');
-const data = await aq.fromCSV(await FileAttachment('data/2024.csv').text(), { parse: { open_dt: parseMDY, closed_dt: parseMDY } });
+const parseMDY = d3.timeParse("%Y-%m-%d %H:%M:%S");
+const data = await aq.fromArrow(
+  await FileAttachment("data/2024.parquet").parquet())
+  .derive({ open_dt: aq.escape(d => parseMDY(d.open_dt)),
+            closed_dt: aq.escape(d => parseMDY(d.closed_dt)) });
 
-const pctOntime = data.rollup({ freq: (d) => aq.op.mean(d.on_time == "ONTIME") });
+const pctOntime = data.rollup({
+  freq: (d) => aq.op.mean(d.on_time == "ONTIME"),
+});
 
 const ctStatus = data.groupby("case_status").count();
 
-const avgClosure = data.filter(d => d.case_status == 'Closed').derive({ avg: aq.escape(d => d3.timeDay.count(d.open_dt,d.closed_dt)) }).rollup({ avg: aq.op.mean('avg')});
+const avgClosure = data
+  .filter((d) => d.case_status == "Closed")
+  .derive({ avg: aq.escape((d) => d3.timeDay.count(d.open_dt, d.closed_dt)) })
+  .rollup({ avg: aq.op.mean("avg") });
 
-const requests = FileAttachment("data/311_2024.geojson").json()
+const requests = FileAttachment("data/311_2024.geojson").json();
 ```
 
 ```js
-/* Inputs.table(requests) */
-/* display(requests) */
+/* Inputs.table([...data]) */
+/* display([...data]); */
 ```
 
 <div class="grid grid-cols-4" style="margin-top: 2rem;">
@@ -67,8 +76,6 @@ const requests = FileAttachment("data/311_2024.geojson").json()
 </div>
 <div>
 
-
-
 <!-- <div class="grid grid-cols-2" style="">
 <div class="card">
 <h2>Case Status</h2>
@@ -92,54 +99,54 @@ const div = document.getElementById("map");
 
 const map = new mapboxgl.Map({
   container: div,
-  accessToken: 'pk.eyJ1IjoiaGVyc2hndXB0YSIsImEiOiJja3o1MXVuZjQwbWxnMm9ua2Rwc2Y5d2tpIn0.KVLDa3UW_yb4l_WkxZYDSQ',
-  style: 'mapbox://styles/mapbox/streets-v12',
+  accessToken:
+    "pk.eyJ1IjoiaGVyc2hndXB0YSIsImEiOiJja3o1MXVuZjQwbWxnMm9ua2Rwc2Y5d2tpIn0.KVLDa3UW_yb4l_WkxZYDSQ",
+  style: "mapbox://styles/mapbox/streets-v12",
   center: [-71.0850612, 42.3432998],
-  zoom: 11
+  zoom: 11,
 });
 
-map.on('load', () => {
-  map.addSource('requests', {
-    type: 'geojson',
-    data: requests
+map.on("load", () => {
+  map.addSource("requests", {
+    type: "geojson",
+    data: requests,
   });
-  map.addLayer(
-  {
-    id: 'requests-point',
-    type: 'circle',
-    source: 'requests',
+  map.addLayer({
+    id: "requests-point",
+    type: "circle",
+    source: "requests",
     minzoom: 10,
     paint: {
-      'circle-radius': {
-          'base': 2,
-          'stops': [
-              [12, 4],
-              [14, 8]
-          ]
+      "circle-radius": {
+        base: 2,
+        stops: [
+          [12, 4],
+          [14, 8],
+        ],
       },
-      'circle-stroke-color': 'white',
-      'circle-color': [
-        'match',
-        ['get','case_status'],
-        'Open',
-        '#50C878',
-        'Closed',
-        '#C1E1C1',
-        '#CCC'
-      ], 
-      'circle-stroke-width': 1
-    }
-  }
-);
+      "circle-stroke-color": "white",
+      "circle-color": [
+        "match",
+        ["get", "case_status"],
+        "Open",
+        "#50C878",
+        "Closed",
+        "#C1E1C1",
+        "#CCC",
+      ],
+      "circle-stroke-width": 1,
+    },
+  });
 });
 
-map.on('click', 'requests-point', (event) => {
+map.on("click", "requests-point", (event) => {
   new mapboxgl.Popup()
     .setLngLat(event.features[0].geometry.coordinates)
-    .setHTML(`<strong>${event.features[0].properties.case_title}</strong><br>Location: ${event.features[0].properties.location}<br>Date Opened: ${event.features[0].properties.open_dt}<br>Status: ${event.features[0].properties.case_status}`)
+    .setHTML(
+      `<strong>${event.features[0].properties.case_title}</strong><br>Location: ${event.features[0].properties.location}<br>Date Opened: ${event.features[0].properties.open_dt}<br>Status: ${event.features[0].properties.case_status}`
+    )
     .addTo(map);
 });
 
 invalidation.then(() => map.remove());
 ```
-

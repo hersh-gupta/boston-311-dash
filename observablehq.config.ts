@@ -25,6 +25,7 @@ export default {
   <meta property="og:type" content="website">
   <meta property="og:title" content="Boston 311 Dashboard">
   <meta property="og:description" content="Explore Boston's 311 data">
+  <meta property="og:image" content="https://raw.githubusercontent.com/hersh-gupta/boston-311-dash/main/image.png" />
 `,
   footer: `Built by <a href="https://github.com/hersh-gupta">Hersh Gupta</a> using the <a href="https://observablehq.com/">Observable Framework</a>.`, // what to show in the footer (HTML)
   // toc: true, // whether to show the table of contents

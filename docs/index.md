@@ -4,7 +4,9 @@ toc: false
 style: custom-style.css
 ---
 
-# Boston 311 Dashboard
+<div style="display: flex; flex-direction: row; align-items: center; margin-left:-20px;">
+<img src="https://www.boston.gov/sites/default/files/styles/med_small_square__200x200_/public/img/columns/2016/11/cob_b_white-01.png?itok=DJqZ8pr6" height="75"><h1>Boston 311 Dashboard</h1>
+<div>
 
 An overview of [Boston's 311 Constituent Service Center](https://www.boston.gov/departments/boston-311) request [data for 2024](https://data.boston.gov/dataset/311-service-requests/resource/dff4d804-5031-443a-8409-8344efd0e5c8), which is kindly made available under the [Public Domain Dedication and License v1.0](http://opendatacommons.org/licenses/pddl/1.0/).
 
@@ -73,11 +75,61 @@ async function arqueroTableToGeoJSON(data) {
 }
 
 const requests = await arqueroTableToGeoJSON(data);
+
+function dailyPlot(df, aggregated, { width } = {}) {
+  return Plot.plot({
+    width,
+    x: { interval: "day", label: "Date" },
+    y: { grid: true, label: "Requests" },
+    marks: [
+      aggregated ? Plot.lineY(
+        df,
+        Plot.groupX(
+          { y: "count" },
+          {
+            x: "open_dt",
+            sort: "open_dt",
+            curve: "basis",
+            tip: {
+              format: {
+                y: (d) => `${d}`,
+                x: (d) => `${d.toDateString()}`,
+              },
+            },
+          }
+        )
+      ) : 
+      Plot.lineY(
+        df,
+        Plot.groupX(
+          { y: "count" },
+          {
+            x: "open_dt",
+            sort: "open_dt",
+            curve: "basis",
+            z: "reason",
+            stroke: "reason",
+            tip: {
+              format: {
+                y: (d) => `${d}`,
+                x: (d) => `${d.toDateString()}`,
+              },
+            },
+          }
+        )
+      ),
+      Plot.ruleY([0]),
+    ],
+    style: {
+      fontFamily: "Montserrat",
+    },
+  });
+}
 ```
 
 ```js
 /* Inputs.table([...data]) */
-/* display(requests); */
+view(aggregate);
 ```
 
 <div class="grid grid-cols-4" style="margin-top: 2rem;">
@@ -100,56 +152,40 @@ const requests = await arqueroTableToGeoJSON(data);
 
 </div>
 
+<!-- ```js
+const reasons = Inputs.checkbox(
+  d3.group(data,(d) => d.reason),
+  {
+    label: "Request Type",
+    unique: true,
+    sort: true,
+    key: ["Code Enforcement", "Enforcement & Abandoned Vehicles", "Housing", "Needle Program", "Highway Maintenance", "Sanitation", "Street Cleaning", "Signs & Signals", "Trees"]
+  }
+);
+const reasonParams = Generators.input(reasons);
+```
+ -->
+
+```js
+const aggregate = Inputs.toggle({ label: "Aggregate", value: true });
+const aggParam = Generators.input(aggregate)
+```
+
   <div class="card">
   <h2>Daily 311 Requests</h2>
   <h3>Total, 2024</h3>
-  <div>${resize((width) =>
-      Plot.plot({
-        width,
-        x: {interval: "day", label: "Date"},
-        y: {grid: true, label: "Requests"},
-        marks: [
-            Plot.lineY(data, Plot.groupX({y:"count"},{x: "open_dt", curve: "basis", 
-            tip: {
-                  format: {
-                    y: (d) => `${d}`,
-                    x: (d) => `${d.toDateString()}`
-                  }
-            }
-              })),
-            Plot.ruleY([0])
-        ],
-        style: {
-          fontFamily: "Montserrat"
-        }
-      })
-  )}</div>
+  <div  style="display: flex; flex-direction: column; gap: 1rem;"">${aggregate}<div>
+  <div>
+    ${resize((width) => dailyPlot(data, aggParam, {width}))}
+  </div>
   </div>
 
 <div class = "card">
 <h2>311 Requests Mapped</h2>
   <h3>Click on a request for more information</h3>
-<div id = "map" style = "height: 400px">
+<div id = "map" style = "height: 500px">
 </div>
 <div>
-
-<!-- <div class="grid grid-cols-2" style="">
-<div class="card">
-<h2>Case Status</h2>
-<h3>Total, 2024</h3>
- ${resize((width) =>
-    Plot.plot({
-      width,
-      x: {label: "Status"},
-      y: {grid: true, label: "Requests"},
-      marks: [
-          Plot.barY(data, Plot.groupX({y:"count"},{x: "case_status",curve: "basis"})),
-        Plot.ruleY([0])
-      ]
-    })
-)}
-</div>
-</div> -->
 
 ```js
 const div = document.getElementById("map");

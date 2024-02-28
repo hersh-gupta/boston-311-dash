@@ -33,7 +33,7 @@ p {
 }
 
 span {
-    font-family: "Montserrat", san-serif;
+    font-family: "Montserrat", san-serif !important;
 }
 
 .mapboxgl-popup-content {

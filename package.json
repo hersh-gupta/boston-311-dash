@@ -9,10 +9,12 @@
     "observable": "observable"
   },
   "dependencies": {
+    "@netlify/functions": "^2.6.0",
     "@observablehq/framework": "latest",
     "@turf/helpers": "^6.5.0",
     "d3-dsv": "^3.0.1",
-    "d3-time-format": "^4.1.0"
+    "d3-time-format": "^4.1.0",
+    "node-fetch": "^3.3.2"
   },
   "engines": {
     "node": ">=20.6"
